@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JobsMatch AI — Smart Job Matching Platform</title>
+    <meta name="description" content="AI-powered job matching platform with CV parsing, skill extraction, and smart recommendations for employers and job searchers.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo" id="nav-logo">
+                <div class="logo-icon">
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                        <path d="M14 2L26 8V20L14 26L2 20V8L14 2Z" stroke="url(#logoGrad)" stroke-width="2" fill="none"/>
+                        <path d="M14 10L20 13V19L14 22L8 19V13L14 10Z" fill="url(#logoGrad)"/>
+                        <defs>
+                            <linearGradient id="logoGrad" x1="2" y1="2" x2="26" y2="26">
+                                <stop stop-color="#ffffff"/>
+                                <stop offset="1" stop-color="#888888"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <span>JobsMatch<span class="logo-ai">AI</span></span>
+            </a>
+            <div class="nav-links" id="nav-links">
+                <a href="#" class="nav-link active" data-page="dashboard">Dashboard</a>
+                <a href="#" class="nav-link" data-page="jobs">Jobs</a>
+                <a href="#" class="nav-link" data-page="cv">CV Parser</a>
+                <a href="#" class="nav-link" data-page="matching">Matching</a>
+                <a href="#" class="nav-link hidden" data-page="profile" id="nav-profile">Profile</a>
+                <a href="#" class="nav-link hidden" data-page="candidates" id="nav-candidates">Candidates</a>
+                <a href="#" class="nav-link hidden" data-page="talent" id="nav-talent">Find Talent</a>
+                <a href="#" class="nav-link hidden" data-page="admin" id="nav-admin">Admin</a>
+            </div>
+            <div class="nav-actions">
+                <div class="auth-buttons" id="auth-buttons">
+                    <button class="btn btn-ghost" id="btn-login">Sign In</button>
+                    <button class="btn btn-primary" id="btn-register">Get Started</button>
+                </div>
+                <div class="user-menu hidden" id="user-menu">
+                    <div class="notif-bell-wrap" id="notif-bell-wrap">
+                        <button class="notif-bell" id="btn-notifications" title="Notifications">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                            <span class="notif-badge hidden" id="notif-badge">0</span>
+                        </button>
+                        <!-- Notification Dropdown -->
+                        <div class="notif-dropdown hidden" id="notif-dropdown">
+                            <div class="notif-dropdown-header">
+                                <h3>Notifications</h3>
+                                <button class="btn btn-ghost btn-sm" id="btn-mark-all-read">Mark all read</button>
+                            </div>
+                            <div class="notif-dropdown-body" id="notif-list">
+                                <div class="notif-empty">No notifications yet</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-avatar" id="user-avatar">U</div>
+                    <span class="user-name" id="user-name">User</span>
+                    <span class="user-role-badge" id="user-role-badge"></span>
+                    <button class="btn btn-ghost btn-sm" id="btn-logout">Logout</button>
+                </div>
+            </div>
+            <button class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay hidden" id="auth-modal">
+        <div class="modal">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <div class="modal-header">
+                <h2 id="modal-title">Sign In</h2>
+                <p id="modal-subtitle">Welcome back to JobsMatch AI</p>
+            </div>
+            <form id="auth-form" class="modal-form">
+                <div class="form-group hidden" id="name-group">
+                    <label for="auth-name">Full Name</label>
+                    <input type="text" id="auth-name" placeholder="John Doe" autocomplete="name">
+                </div>
+                <div class="form-group">
+                    <label for="auth-email">Email</label>
+                    <input type="email" id="auth-email" placeholder="you@example.com" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="auth-password">Password</label>
+                    <input type="password" id="auth-password" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+                <!-- Role Selection (shown on register) -->
+                <div class="form-group hidden" id="role-group">
+                    <label>I am a...</label>
+                    <div class="role-selector" id="role-selector">
+                        <div class="role-option selected" data-role="searcher">
+                            <div class="role-icon">🔍</div>
+                            <div class="role-name">Job Searcher</div>
+                            <div class="role-desc">Find your next role</div>
+                        </div>
+                        <div class="role-option" data-role="employer">
+                            <div class="role-icon">🏢</div>
+                            <div class="role-name">Employer</div>
+                            <div class="role-desc">Hire top talent</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group hidden" id="company-group">
+                    <label for="auth-company">Company / Business Name</label>
+                    <input type="text" id="auth-company" placeholder="Acme Corp">
+                </div>
+                <div class="form-group hidden" id="employer-type-group">
+                    <label>Employer Type</label>
+                    <div class="employer-type-selector" id="employer-type-selector">
+                        <div class="etype-option selected" data-etype="company">
+                            <div class="etype-icon">🏢</div>
+                            <div class="etype-name">Company</div>
+                        </div>
+                        <div class="etype-option" data-etype="individual">
+                            <div class="etype-icon">👤</div>
+                            <div class="etype-name">Individual</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group hidden" id="title-group">
+                    <label for="auth-title">Job Title (optional)</label>
+                    <input type="text" id="auth-title" placeholder="e.g. Full Stack Developer">
+                </div>
+                <div class="form-group hidden" id="experience-group">
+                    <label for="auth-experience">Years of Experience</label>
+                    <input type="number" id="auth-experience" placeholder="3" min="0" max="50">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full" id="auth-submit">Sign In</button>
+                <p class="auth-switch">
+                    <span id="auth-switch-text">Don't have an account?</span>
+                    <a href="#" id="auth-switch-link">Create one</a>
+                </p>
+            </form>
+            <div class="form-error hidden" id="auth-error"></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Page -->
+        <section class="page active" id="page-dashboard">
+            <div class="hero">
+                <div class="hero-content">
+                    <div class="hero-badge">⚡ AI-Powered Job Matching</div>
+                    <h1 class="hero-title">
+                        Find Your <span class="gradient-text">Perfect Match</span><br>
+                        With Smart AI
+                    </h1>
+                    <p class="hero-subtitle">
+                        Upload your CV, let our AI extract your skills, and get instantly matched
+                        with jobs that fit your profile. Employers can discover top candidates ranked by fit.
+                    </p>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary btn-lg" id="hero-start">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15l3 3 3-3"/>
+                            </svg>
+                            Get Started
+                        </button>
+                        <button class="btn btn-outline btn-lg" id="hero-browse">
+                            Browse Jobs
+                        </button>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <span class="stat-number" id="stat-jobs">0</span>
+                            <span class="stat-label">Active Jobs</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number" id="stat-skills">400+</span>
+                            <span class="stat-label">Skills Tracked</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number" id="stat-categories">7</span>
+                            <span class="stat-label">Categories</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="floating-card card-1">
+                        <div class="fc-icon">🎯</div>
+                        <div class="fc-text">95% Match</div>
+                    </div>
+                    <div class="floating-card card-2">
+                        <div class="fc-icon">⚡</div>
+                        <div class="fc-text">Python, React</div>
+                    </div>
+                    <div class="floating-card card-3">
+                        <div class="fc-icon">📊</div>
+                        <div class="fc-text">12 Skills Found</div>
+                    </div>
+                    <div class="orb orb-1"></div>
+                    <div class="orb orb-2"></div>
+                    <div class="orb orb-3"></div>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="features-section">
+                <h2 class="section-title">How It Works</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📄</div>
+                        <h3>Upload CV</h3>
+                        <p>Upload your PDF resume and our AI will automatically extract all your skills, experience, and education.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🧠</div>
+                        <h3>AI Analysis</h3>
+                        <p>Our NLP engine identifies 400+ skills across programming, frameworks, cloud, data science, and more.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3>Smart Matching</h3>
+                        <p>Get scored and ranked against every job listing. See exactly which skills match and which are missing.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <h3>Skill Suggestions</h3>
+                        <p>Discover the most in-demand skills you're missing. Focus your learning on what matters most.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Jobs Page -->
+        <section class="page" id="page-jobs">
+            <div class="page-header">
+                <div>
+                    <h1>Job Listings</h1>
+                    <p class="page-subtitle">Browse available positions or create new ones</p>
+                </div>
+                <button class="btn btn-primary hidden" id="btn-add-job">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Post Job
+                </button>
+            </div>
+
+            <!-- Job Filters -->
+            <div class="filters-bar">
+                <div class="search-box">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <input type="text" id="job-search" placeholder="Search jobs by title or company...">
+                </div>
+                <input type="text" id="job-location" placeholder="Location" class="filter-input">
+                <button class="btn btn-ghost" id="btn-search-jobs">Search</button>
+            </div>
+
+            <!-- Jobs Grid -->
+            <div class="jobs-grid" id="jobs-grid">
+                <div class="empty-state" id="jobs-empty">
+                    <div class="empty-icon">💼</div>
+                    <h3>No jobs listed yet</h3>
+                    <p>Create your first job listing to get started</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add/Edit Job Modal -->
+        <div class="modal-overlay hidden" id="job-modal">
+            <div class="modal modal-lg">
+                <button class="modal-close" id="job-modal-close">&times;</button>
+                <div class="modal-header">
+                    <h2 id="job-modal-title">Post a New Job</h2>
+                    <p>Fill in the job details and required skills</p>
+                </div>
+                <form id="job-form" class="modal-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="job-title">Job Title *</label>
+                            <input type="text" id="job-title" placeholder="e.g. Senior Python Developer" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="job-company">Company *</label>
+                            <input type="text" id="job-company" placeholder="e.g. TechCorp" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="job-description">Description *</label>
+                        <textarea id="job-description" rows="4" placeholder="Describe the role, responsibilities, and requirements..." required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="job-location-input">Location</label>
+                            <input type="text" id="job-location-input" placeholder="e.g. Remote, New York">
+                        </div>
+                        <div class="form-group">
+                            <label for="job-type">Work Mode</label>
+                            <select id="job-type">
+                                <option value="remote">Remote</option>
+                                <option value="onsite">On-site</option>
+                                <option value="hybrid">Hybrid</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="job-employment-type">Employment Type</label>
+                            <select id="job-employment-type">
+                                <option value="permanent">Permanent Employment</option>
+                                <option value="short_term_project">Short-Term Project</option>
+                                <option value="long_term_project">Long-Term Project</option>
+                                <option value="contract">Contract</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="job-worker-type">Looking For</label>
+                            <select id="job-worker-type">
+                                <option value="staff">Permanent Staff</option>
+                                <option value="freelancer">Freelancer</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row hidden" id="duration-group">
+                        <div class="form-group">
+                            <label for="job-duration-min">Min Duration (months)</label>
+                            <input type="number" id="job-duration-min" placeholder="3" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="job-duration-max">Max Duration (months)</label>
+                            <input type="number" id="job-duration-max" placeholder="6" min="1">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="job-salary-min">Min Salary ($)</label>
+                            <input type="number" id="job-salary-min" placeholder="60000">
+                        </div>
+                        <div class="form-group">
+                            <label for="job-salary-max">Max Salary ($)</label>
+                            <input type="number" id="job-salary-max" placeholder="120000">
+                        </div>
+                        <div class="form-group">
+                            <label for="job-experience">Experience (years)</label>
+                            <input type="number" id="job-experience" placeholder="3" min="0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Required Skills</label>
+                        <div class="skills-input-area">
+                            <div class="skills-tags" id="job-skills-tags"></div>
+                            <div class="skills-input-row">
+                                <input type="text" id="job-skill-input" placeholder="Type a skill and press Enter">
+                                <select id="job-skill-importance">
+                                    <option value="required">Required</option>
+                                    <option value="preferred">Preferred</option>
+                                    <option value="nice_to_have">Nice to have</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Post Job</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- CV Parser Page -->
+        <section class="page" id="page-cv">
+            <div class="page-header">
+                <div>
+                    <h1>CV Parser</h1>
+                    <p class="page-subtitle">Upload your resume and extract skills automatically</p>
+                </div>
+            </div>
+
+            <div class="cv-layout">
+                <!-- Upload Area -->
+                <div class="cv-upload-card">
+                    <div class="upload-zone" id="upload-zone">
+                        <div class="upload-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <path d="M14 2v6h6"/>
+                                <path d="M12 18v-6"/>
+                                <path d="M9 15l3-3 3 3"/>
+                            </svg>
+                        </div>
+                        <h3>Drop your CV here</h3>
+                        <p>or click to browse (PDF only, max 10MB)</p>
+                        <input type="file" id="cv-file-input" accept=".pdf" hidden>
+                        <button class="btn btn-primary" id="btn-browse-cv">Choose File</button>
+                    </div>
+                    <div class="upload-status hidden" id="upload-status">
+                        <div class="upload-progress">
+                            <div class="progress-bar" id="progress-bar"></div>
+                        </div>
+                        <p id="upload-status-text">Analyzing CV...</p>
+                    </div>
+
+                    <div class="text-parse-section">
+                        <div class="divider"><span>OR</span></div>
+                        <h4>Paste your CV text</h4>
+                        <textarea id="cv-text-input" rows="6" placeholder="Paste your resume/CV text here for quick skill extraction..."></textarea>
+                        <button class="btn btn-outline btn-full" id="btn-parse-text">Extract Skills from Text</button>
+                    </div>
+                </div>
+
+                <!-- Results Area -->
+                <div class="cv-results-card hidden" id="cv-results">
+                    <div class="results-header">
+                        <h3>📊 Analysis Results</h3>
+                        <button class="btn btn-ghost btn-sm" id="btn-save-skills">Save to Profile</button>
+                    </div>
+
+                    <div class="results-stats">
+                        <div class="result-stat">
+                            <span class="rs-number" id="rs-skills">0</span>
+                            <span class="rs-label">Skills Found</span>
+                        </div>
+                        <div class="result-stat">
+                            <span class="rs-number" id="rs-experience">-</span>
+                            <span class="rs-label">Years Exp.</span>
+                        </div>
+                        <div class="result-stat">
+                            <span class="rs-number" id="rs-education">-</span>
+                            <span class="rs-label">Education</span>
+                        </div>
+                        <div class="result-stat">
+                            <span class="rs-number" id="rs-words">0</span>
+                            <span class="rs-label">Words</span>
+                        </div>
+                    </div>
+
+                    <div class="skills-results">
+                        <h4>Extracted Skills</h4>
+                        <div class="skills-cloud" id="skills-cloud"></div>
+                    </div>
+
+                    <div class="email-result hidden" id="email-result">
+                        <h4>Contact</h4>
+                        <p id="rs-email"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Matching Page (Job Searcher) -->
+        <section class="page" id="page-matching">
+            <div class="page-header">
+                <div>
+                    <h1>Job Matching</h1>
+                    <p class="page-subtitle">See how well you match with available positions</p>
+                </div>
+                <button class="btn btn-primary" id="btn-run-matching">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Run Matching
+                </button>
+            </div>
+
+            <!-- Login/CV notice -->
+            <div class="notice-card" id="matching-notice">
+                <div class="notice-icon">🔐</div>
+                <h3>Login Required</h3>
+                <p>You need to sign in and upload your CV before running job matching.</p>
+                <button class="btn btn-primary" id="btn-matching-login">Sign In to Continue</button>
+            </div>
+
+            <!-- Matching Results -->
+            <div class="matching-results hidden" id="matching-results">
+                <div class="matching-summary" id="matching-summary"></div>
+                <div class="matches-list" id="matches-list"></div>
+            </div>
+
+            <!-- Skill Suggestions -->
+            <div class="suggestions-section hidden" id="suggestions-section">
+                <h2 class="section-title">💡 Skills You Should Learn</h2>
+                <p class="section-subtitle">Based on analysis of top job matches</p>
+                <div class="suggestions-grid" id="suggestions-grid"></div>
+            </div>
+        </section>
+
+        <!-- Profile Page -->
+        <section class="page" id="page-profile">
+            <div class="profile-container">
+                <!-- Profile Header / Cover -->
+                <div class="profile-header-card">
+                    <div class="profile-cover"></div>
+                    <div class="profile-header-body">
+                        <div class="profile-avatar-wrap">
+                            <div class="profile-avatar" id="profile-avatar">
+                                <span id="profile-avatar-letter">U</span>
+                                <img id="profile-avatar-img" src="" alt="" class="hidden">
+                            </div>
+                            <button class="profile-avatar-edit" id="btn-change-avatar" title="Change photo">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                            </button>
+                            <input type="file" id="avatar-file-input" accept="image/*" hidden>
+                        </div>
+                        <div class="profile-header-info">
+                            <h1 id="profile-full-name">Your Name</h1>
+                            <p class="profile-title-text" id="profile-title-text">Add your job title</p>
+                            <div class="profile-badges">
+                                <span class="badge" id="profile-role-badge">Searcher</span>
+                                <span class="profile-joined" id="profile-joined">Joined —</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline" id="btn-edit-profile">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            Edit Profile
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Profile Body Grid -->
+                <div class="profile-body-grid">
+                    <!-- Left Column: Info -->
+                    <div class="profile-info-column">
+                        <!-- Personal Info Card -->
+                        <div class="profile-card">
+                            <h3 class="profile-card-title">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                Personal Information
+                            </h3>
+                            <div class="profile-info-grid" id="profile-info-grid">
+                                <div class="profile-info-item">
+                                    <span class="info-label">📧 Email</span>
+                                    <span class="info-value" id="profile-email">—</span>
+                                </div>
+                                <div class="profile-info-item">
+                                    <span class="info-label">📱 Phone</span>
+                                    <span class="info-value" id="profile-phone">Not set</span>
+                                </div>
+                                <div class="profile-info-item">
+                                    <span class="info-label">💼 Title</span>
+                                    <span class="info-value" id="profile-title">Not set</span>
+                                </div>
+                                <div class="profile-info-item">
+                                    <span class="info-label">🏢 Company</span>
+                                    <span class="info-value" id="profile-company">Not set</span>
+                                </div>
+                                <div class="profile-info-item">
+                                    <span class="info-label">📅 Experience</span>
+                                    <span class="info-value" id="profile-experience">Not set</span>
+                                </div>
+                                <div class="profile-info-item">
+                                    <span class="info-label">🎓 Education</span>
+                                    <span class="info-value" id="profile-education">Not set</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bio Card -->
+                        <div class="profile-card">
+                            <h3 class="profile-card-title">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                                About
+                            </h3>
+                            <p class="profile-bio" id="profile-bio">No bio added yet. Click "Edit Profile" to tell others about yourself.</p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Skills + Stats -->
+                    <div class="profile-skills-column">
+                        <!-- Skills Card -->
+                        <div class="profile-card">
+                            <div class="profile-card-header-row">
+                                <h3 class="profile-card-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    Skills
+                                </h3>
+                                <span class="profile-skill-count" id="profile-skill-count">0 skills</span>
+                            </div>
+                            <div class="profile-skills-cloud" id="profile-skills-cloud">
+                                <p class="text-muted" style="font-size:14px;">No skills extracted yet. Upload your CV to get started.</p>
+                            </div>
+                        </div>
+
+                        <!-- Account Card -->
+                        <div class="profile-card">
+                            <h3 class="profile-card-title">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                Account
+                            </h3>
+                            <div class="profile-info-grid">
+                                <div class="profile-info-item">
+                                    <span class="info-label">Status</span>
+                                    <span class="info-value badge badge-status-active" id="profile-status">Active</span>
+                                </div>
+                                <div class="profile-info-item">
+                                    <span class="info-label">Role</span>
+                                    <span class="info-value" id="profile-role-text">Searcher</span>
+                                </div>
+                                <div class="profile-info-item">
+                                    <span class="info-label">CV Uploaded</span>
+                                    <span class="info-value" id="profile-cv-status">No</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Edit Profile Modal -->
+        <div class="modal-overlay hidden" id="profile-modal">
+            <div class="modal modal-lg">
+                <button class="modal-close" id="profile-modal-close">&times;</button>
+                <div class="modal-header">
+                    <h2>Edit Profile</h2>
+                    <p>Update your personal information</p>
+                </div>
+                <form id="profile-form" class="modal-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-full-name">Full Name</label>
+                            <input type="text" id="edit-full-name" placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-phone">Phone Number</label>
+                            <input type="tel" id="edit-phone" placeholder="+1 (555) 123-4567">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-title">Job Title</label>
+                            <input type="text" id="edit-title" placeholder="Full Stack Developer">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-company">Company</label>
+                            <input type="text" id="edit-company" placeholder="Acme Corp">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-experience">Years of Experience</label>
+                            <input type="number" id="edit-experience" placeholder="3" min="0" max="50">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-education">Education Level</label>
+                            <select id="edit-education">
+                                <option value="">Select...</option>
+                                <option value="High School">High School</option>
+                                <option value="Associate">Associate Degree</option>
+                                <option value="Bachelor">Bachelor's Degree</option>
+                                <option value="Master">Master's Degree</option>
+                                <option value="PhD">PhD / Doctorate</option>
+                                <option value="Bootcamp">Bootcamp / Certificate</option>
+                                <option value="Self-taught">Self-taught</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-bio">Bio</label>
+                        <textarea id="edit-bio" rows="4" placeholder="Tell us about yourself, your interests, and career goals..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Candidates Page (Employer) -->
+        <section class="page" id="page-candidates">
+            <div class="page-header">
+                <div>
+                    <h1>Candidate Search</h1>
+                    <p class="page-subtitle">Find the best candidates for your open positions</p>
+                </div>
+            </div>
+
+            <!-- Job selector for candidate search -->
+            <div class="form-group" style="margin-bottom:24px; max-width:400px;">
+                <label for="candidate-job-select">Select a Job to Search Candidates</label>
+                <select id="candidate-job-select">
+                    <option value="">— Choose a job posting —</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" id="btn-search-candidates" style="margin-bottom:24px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                Search Candidates
+            </button>
+
+            <!-- Candidate Results -->
+            <div class="hidden" id="candidate-results">
+                <div class="matching-summary" id="candidate-summary"></div>
+                <div class="matches-list" id="candidates-list"></div>
+            </div>
+        </section>
+
+        <!-- Find Talent Page (Employer only) -->
+        <section class="page" id="page-talent">
+            <div class="page-header">
+                <div>
+                    <h1>Find Talent</h1>
+                    <p class="page-subtitle">Search for workers globally by skills, profile, or education</p>
+                </div>
+            </div>
+
+            <div class="talent-search-bar">
+                <div class="talent-search-row">
+                    <div class="search-box" style="flex:2">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <input type="text" id="talent-search-q" placeholder="Search by job profile (e.g. developer, economist, designer...)">
+                    </div>
+                    <input type="text" id="talent-search-skills" placeholder="Skills (comma separated)" class="filter-input" style="flex:1">
+                    <input type="text" id="talent-search-education" placeholder="Education (e.g. MSc, MBA, PhD...)" class="filter-input" style="flex:1">
+                    <button class="btn btn-primary" id="btn-search-talent">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        Search
+                    </button>
+                </div>
+            </div>
+
+            <div class="hidden" id="talent-results">
+                <div class="talent-results-count" id="talent-results-count"></div>
+                <div class="talent-results-grid" id="talent-results-grid"></div>
+            </div>
+        </section>
+
+        <!-- Admin Page -->
+        <section class="page" id="page-admin">
+            <div class="page-header">
+                <div>
+                    <h1>Admin Dashboard</h1>
+                    <p class="page-subtitle">System overview and user management</p>
+                </div>
+                <button class="btn btn-outline" id="btn-refresh-admin">
+                    Refresh
+                </button>
+            </div>
+
+            <!-- System Stats -->
+            <div class="admin-stats-grid" id="admin-stats-grid"></div>
+
+            <!-- User Management -->
+            <h2 style="font-size:20px; font-weight:600; margin-bottom:16px;">User Management</h2>
+            <div class="filters-bar" style="margin-bottom:16px;">
+                <div class="search-box">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <input type="text" id="admin-user-search" placeholder="Search users by name or email...">
+                </div>
+                <select id="admin-role-filter" class="filter-input" style="width:140px;">
+                    <option value="">All Roles</option>
+                    <option value="searcher">Searcher</option>
+                    <option value="employer">Employer</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <select id="admin-status-filter" class="filter-input" style="width:140px;">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="suspended">Suspended</option>
+                </select>
+                <button class="btn btn-ghost" id="btn-admin-search">Search</button>
+            </div>
+            <div id="admin-users-list"></div>
+        </section>
+    </main>
+
+    <!-- Mobile Bottom Tab Bar -->
+    <div class="bottom-tab-bar" id="bottom-tab-bar">
+        <div class="tab-bar-inner">
+            <button class="tab-item active" data-page="dashboard" id="tab-home">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Home</span>
+            </button>
+            <button class="tab-item" data-page="jobs" id="tab-search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <span>Search</span>
+            </button>
+            <button class="tab-item" data-page="profile" id="tab-profile">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Profile</span>
+            </button>
+            <button class="tab-item" data-page="matching" id="tab-matching">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span>Match</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Apply Job Modal -->
+    <div class="modal-overlay hidden" id="apply-modal">
+        <div class="modal">
+            <button class="modal-close" id="apply-modal-close">&times;</button>
+            <div class="modal-header">
+                <h2 id="apply-modal-title">Apply to Job</h2>
+                <p id="apply-modal-subtitle">Submit your application</p>
+            </div>
+            <form id="apply-form" class="modal-form">
+                <input type="hidden" id="apply-job-id">
+                <div class="form-group">
+                    <label for="apply-cover-letter">Cover Letter (Optional)</label>
+                    <textarea id="apply-cover-letter" rows="6" placeholder="Tell the employer why you're a great fit for this role..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full" id="btn-submit-apply">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                    Submit Application
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Applicant Detail Modal (for employers viewing notifications) -->
+    <div class="modal-overlay hidden" id="applicant-modal">
+        <div class="modal modal-lg">
+            <button class="modal-close" id="applicant-modal-close">&times;</button>
+            <div class="modal-header">
+                <h2>Applicant Details</h2>
+                <p id="applicant-modal-subtitle">Application for <span id="applicant-job-title"></span></p>
+            </div>
+            <div id="applicant-detail-body">
+                <!-- Filled dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Candidate Profile Modal (for employers viewing a searcher) -->
+    <div class="modal-overlay hidden" id="candidate-profile-modal">
+        <div class="modal modal-lg">
+            <button class="modal-close" id="candidate-profile-close">&times;</button>
+            <div id="candidate-profile-body">
+                <!-- Filled dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Best Candidates Modal -->
+    <div class="modal-overlay hidden" id="best-candidates-modal">
+        <div class="modal modal-lg">
+            <button class="modal-close" id="best-candidates-close">&times;</button>
+            <div class="modal-header">
+                <h2>Best Candidates</h2>
+                <p>Top 10 matches for <span id="best-candidates-job-title" style="font-weight:600"></span></p>
+            </div>
+            <div class="best-candidates-filters">
+                <input type="text" id="bc-filter-q" placeholder="Filter by profile..." class="filter-input">
+                <input type="text" id="bc-filter-skills" placeholder="Filter by skills..." class="filter-input">
+                <input type="text" id="bc-filter-education" placeholder="Filter by education..." class="filter-input">
+                <button class="btn btn-ghost btn-sm" id="btn-bc-filter">Filter</button>
+            </div>
+            <div id="best-candidates-body">
+                <!-- Filled dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

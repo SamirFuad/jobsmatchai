@@ -1,0 +1,39 @@
+# ============================================
+# Smart Job Matching Platform — Docker Compose
+# ============================================
+# Usage:
+#   docker-compose up -d          (start in background)
+#   docker-compose down           (stop)
+#   docker-compose logs -f app    (view logs)
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jobsmatchai
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+      - DATABASE_PATH=/app/data/smart_jobs.db
+      - SECRET_KEY=${SECRET_KEY:-change-this-to-a-strong-secret-in-production}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-1440}
+    volumes:
+      # Persist database and uploads across container restarts
+      - jobsmatchai-data:/app/data
+      - jobsmatchai-uploads:/app/uploads
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  jobsmatchai-data:
+    driver: local
+  jobsmatchai-uploads:
+    driver: local

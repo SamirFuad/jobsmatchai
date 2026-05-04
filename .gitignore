@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+
+# Database (SQLite)
+*.db
+*.db-shm
+*.db-wal
+data/
+
+# Uploads
+uploads/
+
+# Python (legacy)
+venv/
+_archive_python/
+__pycache__/
+*.pyc
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# Test / temp
+test_api.js
+verify_fix.js
+
+# Logs
+npm-debug.log*
